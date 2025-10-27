@@ -1,0 +1,22 @@
+package config
+
+import (
+	"log"
+	"os"
+	"voice-app/domain"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+)
+
+func InitDB() *gorm.DB {
+	dsn := os.Getenv("DATABASE_URL")
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("Failed to connect database: %s", err)
+	}
+
+	db.AutoMigrate(&domain.User{}, &domain.Role{})
+
+	return db
+}

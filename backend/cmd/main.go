@@ -2,16 +2,18 @@ package main
 
 import (
 	"log"
-	"voice-app/backend/config"
-	speech2 "voice-app/backend/internal/speech"
-	"voice-app/backend/middleware"
+	"voice-app/config"
+	auth2 "voice-app/internal/auth"
+	"voice-app/internal/speech"
+	"voice-app/internal/user"
+	"voice-app/middleware"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	err := godotenv.Load(".env")
+	err := godotenv.Load("backend/.env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
@@ -20,13 +22,19 @@ func main() {
 
 	router := gin.Default()
 
-	speechService := speech2.NewService()
-	speechHandler := speech2.NewHandler(speechService)
+	userRepo := user.NewRepository()
+	authService := auth2.NewService(userRepo)
+	authHandler := auth2.NewHandler(authService)
+
+	speechService := speech.NewService()
+	speechHandler := speech.NewHandler(speechService)
+
+	auth := router.Group("/auth")
+	auth.POST("/register", authHandler.Register)
 
 	api := router.Group("/api/v1")
 	api.Use(middleware.JWTAuth())
 
-	router.GET("/test", func(c *gin.Context) { c.JSON(200, "test") })
 	router.POST("/api/speech/recognize", speechHandler.Recognize)
 
 	router.Run(":8080")

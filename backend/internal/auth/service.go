@@ -2,6 +2,7 @@ package auth
 
 import (
 	"voice-app/domain"
+	"voice-app/internal/user"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -10,10 +11,11 @@ type Service interface {
 	Register(phoneNumber, password string, roles []string) (*domain.User, error)
 }
 type service struct {
+	repository user.Repository
 }
 
-func NewService() *service {
-	return &service{}
+func NewService(repository user.Repository) Service {
+	return &service{repository: repository}
 }
 
 func (s *service) Register(phoneNumber, password string, roles []string) (*domain.User, error) {
@@ -25,14 +27,16 @@ func (s *service) Register(phoneNumber, password string, roles []string) (*domai
 	user := &domain.User{
 		PhoneNumber: phoneNumber,
 		Password:    string(hash),
-		Roles:       make([]*domain.Role, len(roles)),
+		Roles:       make([]domain.Role, len(roles)),
 	}
 
 	for i, roleName := range roles {
-		user.Roles[i] = &domain.Role{Name: roleName}
+		user.Roles[i] = domain.Role{Name: roleName}
 	}
 
-	if err := s.repo.Create(user); err != nil {
+	if err := s.repository.Create(user); err != nil {
 		return nil, err
 	}
+
+	return user, nil
 }

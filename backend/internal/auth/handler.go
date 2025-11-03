@@ -14,14 +14,30 @@ func NewHandler(service Service) *Handler {
 	return &Handler{service: service}
 }
 
-var registerRequest struct {
-	PhoneNumber string   `json:"phone_number"`
+type registerRequest struct {
+	PhoneNumber string   `json:"phoneNumber"`
 	Password    string   `json:"password"`
 	Roles       []string `json:"roles"`
 }
 
+type authRequest struct {
+	PhoneNumber string `json:"phoneNumber"`
+	Password    string `json:"password"`
+}
+
+// Register godoc
+// @Summary Register new user
+// @Description Register a new user with phone, password and roles
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param data body registerRequest true "User data"
+// @Success 201 {object} domain.User
+// @Failure 400 {object} map[string]string
+// @Failure 500 {object} map[string]string
+// @Router /register [post]
 func (h *Handler) Register(c *gin.Context) {
-	var req = &registerRequest
+	var req = &registerRequest{}
 
 	if err := c.ShouldBindJSON(req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -35,4 +51,31 @@ func (h *Handler) Register(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"user": user})
+}
+
+// Login godoc
+// @Summary Login user
+// @Description Login and receive JWT token
+// @Tags auth
+// @Accept json
+// @Produce json
+// @Param data body authRequest true "Login data"
+// @Success 200 {object} domain.User
+// @Failure 401 {object} map[string]string
+// @Router /login [post]
+func (h *Handler) Login(c *gin.Context) {
+	var req = &authRequest{}
+
+	if err := c.ShouldBindJSON(req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	token, err := h.service.Login(req.PhoneNumber, req.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": token})
 }

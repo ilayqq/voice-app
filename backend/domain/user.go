@@ -2,8 +2,8 @@ package domain
 
 type User struct {
 	ID          uint   `gorm:"primaryKey;autoIncrement"`
-	FullName    string `gorm:"not null" json:"fullName"`
-	PhoneNumber string `json:"phoneNumber" gorm:"unique"`
+	FullName    string `gorm:"not null"`
+	PhoneNumber string
 	Password    string `gorm:"not null"`
 	Roles       []Role `gorm:"many2many:user_roles;"`
 }

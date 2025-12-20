@@ -21,7 +21,7 @@ import (
 // @host localhost:8080
 // @BasePath /api/v1
 func main() {
-	err := godotenv.Load("backend/.env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}

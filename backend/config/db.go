@@ -18,7 +18,7 @@ func InitDB() *gorm.DB {
 		log.Fatalf("Failed to connect database: %s", err)
 	}
 
-	db.AutoMigrate(&domain.User{}, &domain.Role{})
+	db.AutoMigrate(&domain.User{}, &domain.Role{}, &domain.Stock{}, &domain.StockMovement{}, &domain.Product{}, &domain.Warehouse{})
 
 	DB = db
 

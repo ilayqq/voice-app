@@ -25,17 +25,22 @@ type authRequest struct {
 	Password    string `json:"password"`
 }
 
+type authResponse struct {
+	Token string `json:"token"`
+}
+
 // Register godoc
-// @Summary Register new user
-// @Description Register a new user with phone, password and roles
-// @Tags auth
-// @Accept json
-// @Produce json
-// @Param data body registerRequest true "User data"
-// @Success 201 {object} domain.User
-// @Failure 400 {object} map[string]string
-// @Failure 500 {object} map[string]string
-// @Router /register [post]
+//
+//	@Summary		Register new user
+//	@Description	Register a new user with phone, password and roles
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		registerRequest	true	"User data"
+//	@Success		201		{object}	domain.User
+//	@Failure		400		{object}	map[string]string
+//	@Failure		500		{object}	map[string]string
+//	@Router			/register [post]
 func (h *Handler) Register(c *gin.Context) {
 	var req = &registerRequest{}
 
@@ -54,15 +59,16 @@ func (h *Handler) Register(c *gin.Context) {
 }
 
 // Login godoc
-// @Summary Login user
-// @Description Login and receive JWT token
-// @Tags auth
-// @Accept json
-// @Produce json
-// @Param data body authRequest true "Login data"
-// @Success 200 {object} domain.User
-// @Failure 401 {object} map[string]string
-// @Router /login [post]
+//
+//	@Summary		Login user
+//	@Description	Login and receive JWT token
+//	@Tags			auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			data	body		authRequest	true	"Login data"
+//	@Success		200		{object}	authResponse
+//	@Failure		401		{object}	map[string]string
+//	@Router			/login [post]
 func (h *Handler) Login(c *gin.Context) {
 	var req = &authRequest{}
 

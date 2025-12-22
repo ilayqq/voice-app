@@ -2,14 +2,16 @@ package user
 
 import (
 	"errors"
-	"gorm.io/gorm"
 	"voice-app/config"
 	"voice-app/domain"
+
+	"gorm.io/gorm"
 )
 
 type Repository interface {
 	Create(user *domain.User) error
 	Exist(phoneNumber string) (*domain.User, error)
+	GetAll() ([]domain.User, error)
 	GetByPhoneNumber(phoneNumber string) (*domain.User, error)
 }
 type repository struct {
@@ -30,6 +32,17 @@ func (r *repository) Exist(phoneNumber string) (*domain.User, error) {
 		return nil, nil
 	}
 	return &user, exist.Error
+}
+
+func (r *repository) GetAll() ([]domain.User, error) {
+	var users []domain.User
+
+	result := config.DB.Preload("Roles").Find(&users)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	return users, nil
 }
 
 func (r *repository) GetByPhoneNumber(phoneNumber string) (*domain.User, error) {

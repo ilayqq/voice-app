@@ -18,7 +18,7 @@ func NewHandler(service Service) *Handler { return &Handler{service: service} }
 //	@Description	Get all users or filter by phone number
 //	@Tags			users
 //	@Param			phone_number	query		string	false	"Phone number"
-//	@Success		200				{array}		domain.User
+//	@Success		200				{array}		dto.UserResponse
 //	@Failure		500				{object}	map[string]string
 //	@Router			/users [get]
 //	@Security		BearerAuth

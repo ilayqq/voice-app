@@ -15,6 +15,17 @@ func NewHandler(service Service) *Handler {
 	return &Handler{service}
 }
 
+// GetAll godoc
+//
+//	@Summary		Get products
+//	@Description	Get all products
+//	@Tags			products
+//	@Success		200	{array}		domain.Product
+//	@Failure		401	{object}	map[string]string
+//	@Failure		403	{object}	map[string]string
+//	@Failure		500	{object}	map[string]string
+//	@Router			/products [get]
+//	@Security		BearerAuth
 func (h *Handler) GetAll(c *gin.Context) {
 	products, err := h.service.GetAll()
 	if err != nil {

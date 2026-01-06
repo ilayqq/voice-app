@@ -7,6 +7,7 @@ import (
 
 type Repository interface {
 	GetAll() ([]domain.Product, error)
+	GetByBarcode(code string) (*domain.Product, error)
 	Create(product *domain.Product) error
 }
 
@@ -20,6 +21,12 @@ func (r *repository) GetAll() ([]domain.Product, error) {
 	var products []domain.Product
 	config.DB.Find(&products)
 	return products, nil
+}
+
+func (r *repository) GetByBarcode(code string) (*domain.Product, error) {
+	var product domain.Product
+	result := config.DB.Where("barcode = ?", code).First(&product)
+	return &product, result.Error
 }
 
 func (r *repository) Create(product *domain.Product) error {

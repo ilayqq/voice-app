@@ -2,6 +2,7 @@ package user
 
 import (
 	"net/http"
+	"voice-app/dto"
 
 	"github.com/gin-gonic/gin"
 )
@@ -42,5 +43,19 @@ func (h *Handler) GetUsers(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, users)
+	userDTOs := make([]dto.UserResponse, len(users))
+	for i, u := range users {
+		roleName := ""
+		if len(u.Roles) > 0 {
+			roleName = u.Roles[0].Name
+		}
+		userDTOs[i] = dto.UserResponse{
+			ID:          u.ID,
+			FullName:    u.FullName,
+			PhoneNumber: u.PhoneNumber,
+			RoleName:    roleName,
+		}
+	}
+
+	c.JSON(http.StatusOK, userDTOs)
 }

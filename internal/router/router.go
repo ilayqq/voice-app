@@ -40,7 +40,7 @@ func NewRouter(
 	{
 		user := api.Group("/users")
 		{
-			user.GET("", userHandler.GetUsers)
+			user.GET("", middleware.RequireRole("owner"), userHandler.GetUsers)
 		}
 		product := api.Group("/products")
 		{

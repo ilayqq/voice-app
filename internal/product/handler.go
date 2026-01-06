@@ -27,6 +27,19 @@ func NewHandler(service Service) *Handler {
 //	@Router			/products [get]
 //	@Security		BearerAuth
 func (h *Handler) GetAll(c *gin.Context) {
+	barcode := c.Query("barcode")
+
+	if barcode != "" {
+		product, err := h.service.GetByBarcode(barcode)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "product not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, product)
+		return
+	}
+
 	products, err := h.service.GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})

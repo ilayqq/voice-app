@@ -9,6 +9,13 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+type Claims struct {
+	UserID      uint     `json:"sub"`
+	PhoneNumber string   `json:"phoneNumber"`
+	Roles       []string `json:"roles"`
+	jwt.RegisteredClaims
+}
+
 func JWTAuth() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
@@ -19,31 +26,19 @@ func JWTAuth() gin.HandlerFunc {
 
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
-		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		claims := &Claims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
 			return []byte(os.Getenv("JWT_SECRET")), nil
 		})
+
 		if err != nil || !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}
 
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid claims"})
-			return
-		}
-
-		if roles, ok := claims["roles"].([]interface{}); ok {
-			strRoles := make([]string, len(roles))
-			for i, r := range roles {
-				strRoles[i] = r.(string)
-			}
-			c.Set("user_roles", strRoles)
-		}
-
-		if sub, ok := claims["sub"].(string); ok {
-			c.Set("user_id", sub)
-		}
+		c.Set("user_id", claims.UserID)
+		c.Set("roles", claims.Roles)
+		c.Set("phone", claims.PhoneNumber)
 
 		c.Next()
 	}

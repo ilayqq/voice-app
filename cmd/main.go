@@ -45,8 +45,7 @@ func main() {
 
 	router := router2.NewRouter(authHandler, userHandler, productHandler)
 
-	router.Run(":8080")
-	if err != nil {
+	if err := router.Run(":8080"); err != nil {
 		log.Printf("Error starting server: %s", err)
 	}
 }

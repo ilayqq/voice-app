@@ -1,12 +1,16 @@
 package router
 
 import (
+	_ "voice-app/docs"
 	"voice-app/internal/auth"
 	"voice-app/internal/product"
 	"voice-app/internal/user"
 	"voice-app/middleware"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func NewRouter(
@@ -15,6 +19,15 @@ func NewRouter(
 	productHandler *product.Handler,
 ) *gin.Engine {
 	r := gin.Default()
+
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:573"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
 
 	auth := r.Group("/auth")
 	{

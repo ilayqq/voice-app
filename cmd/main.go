@@ -10,8 +10,6 @@ import (
 	"voice-app/internal/user"
 
 	"github.com/joho/godotenv"
-	swaggerFiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 //	@title			Voice-app API
@@ -46,8 +44,6 @@ func main() {
 	//speechHandler := speech.NewHandler(speechService)
 
 	router := router2.NewRouter(authHandler, userHandler, productHandler)
-
-	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.Run(":8080")
 	if err != nil {

@@ -1,4 +1,0 @@
-package role
-
-func InitRBAC() {
-}

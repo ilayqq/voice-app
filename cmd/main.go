@@ -8,6 +8,7 @@ import (
 	"voice-app/internal/product"
 	router2 "voice-app/internal/router"
 	"voice-app/internal/user"
+	"voice-app/internal/warehouse"
 
 	"github.com/joho/godotenv"
 )
@@ -40,10 +41,14 @@ func main() {
 	productService := product.NewService(productRepo)
 	productHandler := product.NewHandler(productService)
 
+	warehouseRepo := warehouse.NewRepository()
+	warehouseService := warehouse.NewService(warehouseRepo)
+	warehouseHandler := warehouse.NewHandler(warehouseService)
+
 	//speechService := speech.NewService()
 	//speechHandler := speech.NewHandler(speechService)
 
-	router := router2.NewRouter(authHandler, userHandler, productHandler)
+	router := router2.NewRouter(authHandler, userHandler, productHandler, warehouseHandler)
 
 	if err := router.Run(":8080"); err != nil {
 		log.Printf("Error starting server: %s", err)

@@ -5,6 +5,7 @@ import (
 	"voice-app/internal/auth"
 	"voice-app/internal/product"
 	"voice-app/internal/user"
+	"voice-app/internal/warehouse"
 	"voice-app/middleware"
 
 	"github.com/gin-contrib/cors"
@@ -17,6 +18,7 @@ func NewRouter(
 	authHandler *auth.Handler,
 	userHandler *user.Handler,
 	productHandler *product.Handler,
+	warehouseHandler *warehouse.Handler,
 ) *gin.Engine {
 	r := gin.Default()
 
@@ -46,6 +48,11 @@ func NewRouter(
 		{
 			product.GET("", productHandler.GetAll)
 			product.POST("", productHandler.AddProduct)
+		}
+		warehouse := api.Group("/warehouse")
+		{
+			warehouse.GET("", warehouseHandler.GetAll)
+			warehouse.POST("", warehouseHandler.AddWarehouse)
 		}
 	}
 

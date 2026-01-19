@@ -1,5 +1,33 @@
 basePath: /api/v1
 definitions:
+  auth.authRequest:
+    properties:
+      password:
+        type: string
+      phoneNumber:
+        type: string
+    type: object
+  auth.authResponse:
+    properties:
+      token:
+        type: string
+    type: object
+  auth.registerRequest:
+    properties:
+      password:
+        type: string
+      phoneNumber:
+        type: string
+      roles:
+        items:
+          type: string
+        type: array
+    type: object
+  domain.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
   domain.Product:
     properties:
       barcode:
@@ -115,6 +143,17 @@ definitions:
       updatedAt:
         type: string
     type: object
+  dto.ProductRequest:
+    properties:
+      barcode:
+        type: string
+      category:
+        type: string
+      description:
+        type: string
+      name:
+        type: string
+    type: object
   dto.UserResponse:
     properties:
       full_name:
@@ -125,29 +164,6 @@ definitions:
         type: string
       role:
         type: string
-    type: object
-  internal_auth.authRequest:
-    properties:
-      password:
-        type: string
-      phoneNumber:
-        type: string
-    type: object
-  internal_auth.authResponse:
-    properties:
-      token:
-        type: string
-    type: object
-  internal_auth.registerRequest:
-    properties:
-      password:
-        type: string
-      phoneNumber:
-        type: string
-      roles:
-        items:
-          type: string
-        type: array
     type: object
 host: localhost:8080
 info:
@@ -167,14 +183,14 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/internal_auth.authRequest'
+          $ref: '#/definitions/auth.authRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/internal_auth.authResponse'
+            $ref: '#/definitions/auth.authResponse'
         "401":
           description: Unauthorized
           schema:
@@ -217,6 +233,39 @@ paths:
       summary: Get products
       tags:
       - products
+    post:
+      description: Add new product
+      parameters:
+      - description: Product data
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ProductRequest'
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.Product'
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "403":
+          description: Forbidden
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/domain.ErrorResponse'
+      security:
+      - BearerAuth: []
+      summary: Add product
+      tags:
+      - products
   /register:
     post:
       consumes:
@@ -228,7 +277,7 @@ paths:
         name: data
         required: true
         schema:
-          $ref: '#/definitions/internal_auth.registerRequest'
+          $ref: '#/definitions/auth.registerRequest'
       produces:
       - application/json
       responses:

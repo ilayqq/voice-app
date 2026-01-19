@@ -49,6 +49,18 @@ func (h *Handler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, products)
 }
 
+// AddProduct godoc
+//
+//	@Summary		Add product
+//	@Description	Add new product
+//	@Tags			products
+//	@Param			data	body		dto.ProductRequest	true	"Product data"
+//	@Success		200		{array}		domain.Product
+//	@Failure		401		{object}	domain.ErrorResponse
+//	@Failure		403		{object}	domain.ErrorResponse
+//	@Failure		500		{object}	domain.ErrorResponse
+//	@Router			/products [post]
+//	@Security		BearerAuth
 func (h *Handler) AddProduct(c *gin.Context) {
 	var product domain.Product
 	if err := c.ShouldBindJSON(&product); err != nil {

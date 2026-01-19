@@ -19,7 +19,7 @@ func NewRepository() Repository {
 
 func (r *repository) GetAll() ([]domain.Product, error) {
 	var products []domain.Product
-	config.DB.Find(&products)
+	config.DB.Preload("Stocks").Find(&products)
 	return products, nil
 }
 

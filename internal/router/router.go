@@ -3,7 +3,9 @@ package router
 import (
 	_ "voice-app/docs"
 	"voice-app/internal/auth"
+	"voice-app/internal/oauth"
 	"voice-app/internal/product"
+	"voice-app/internal/speech"
 	"voice-app/internal/user"
 	"voice-app/internal/warehouse"
 	"voice-app/middleware"
@@ -16,25 +18,33 @@ import (
 
 func NewRouter(
 	authHandler *auth.Handler,
+	oauthHandler *oauth.Handler,
 	userHandler *user.Handler,
 	productHandler *product.Handler,
 	warehouseHandler *warehouse.Handler,
+	speechHandler *speech.Handler,
 ) *gin.Engine {
 	r := gin.Default()
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"},
+		//AllowOrigins:     []string{"http://localhost:5173"},
+		AllowOrigins:     []string{"*"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
-		AllowCredentials: true,
+		AllowCredentials: false,
 	}))
 
 	auth := r.Group("/auth")
 	{
 		auth.POST("/login", authHandler.Login)
 		auth.POST("/register", authHandler.Register)
+	}
+	oauthGoogle := r.Group("/oauth/google")
+	{
+		oauthGoogle.GET("", oauthHandler.GoogleLogin)
+		oauthGoogle.GET("/callback", oauthHandler.GoogleCallback)
 	}
 
 	api := r.Group("/api/v1")
@@ -53,6 +63,10 @@ func NewRouter(
 		{
 			warehouse.GET("", warehouseHandler.GetAll)
 			warehouse.POST("", warehouseHandler.AddWarehouse)
+		}
+		voice := api.Group("/voice")
+		{
+			voice.POST("/upload", speechHandler.Recognize)
 		}
 	}
 

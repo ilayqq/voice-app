@@ -53,6 +53,7 @@ func NewRouter(
 		user := api.Group("/users")
 		{
 			user.GET("", middleware.RequireRole("owner"), userHandler.GetUsers)
+			user.PATCH("", middleware.RequireRole("owner"), userHandler.UpdateUser)
 		}
 		product := api.Group("/products")
 		{

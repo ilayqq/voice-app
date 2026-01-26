@@ -3,6 +3,7 @@ package warehouse
 import (
 	"net/http"
 	"voice-app/domain"
+	"voice-app/internal/mapper"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,13 +17,31 @@ func NewHandler(service Service) *Handler {
 }
 
 func (h *Handler) GetAll(c *gin.Context) {
-	warehouse, err := h.service.GetAll()
+	ownerPhone := c.Query("phone_number")
+
+	if ownerPhone != "" {
+		warehouses, err := h.service.GetByOwnerPhone(ownerPhone)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "warehouse not found"})
+			return
+		}
+
+		if len(warehouses) == 0 {
+			c.JSON(http.StatusNotFound, gin.H{"error": "warehouse not found"})
+			return
+		}
+
+		c.JSON(http.StatusOK, mapper.MapWarehousesToDTO(warehouses))
+		return
+	}
+
+	warehouseDTO, err := h.service.GetAll()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
 		return
 	}
 
-	c.JSON(http.StatusOK, warehouse)
+	c.JSON(http.StatusOK, mapper.MapWarehousesToDTO(warehouseDTO))
 }
 
 func (h *Handler) AddWarehouse(c *gin.Context) {

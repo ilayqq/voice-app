@@ -3,6 +3,7 @@ package user
 import (
 	"net/http"
 	"voice-app/dto"
+	"voice-app/internal/mapper"
 
 	"github.com/gin-gonic/gin"
 )
@@ -33,7 +34,7 @@ func (h *Handler) GetUsers(c *gin.Context) {
 			return
 		}
 
-		c.JSON(http.StatusOK, user)
+		c.JSON(http.StatusOK, mapper.MapUserToDTO(*user))
 		return
 	}
 
@@ -43,19 +44,37 @@ func (h *Handler) GetUsers(c *gin.Context) {
 		return
 	}
 
-	userDTOs := make([]dto.UserResponse, len(users))
-	for i, u := range users {
-		roleName := ""
-		if len(u.Roles) > 0 {
-			roleName = u.Roles[0].Name
-		}
-		userDTOs[i] = dto.UserResponse{
-			ID:          u.ID,
-			FullName:    u.FullName,
-			PhoneNumber: u.PhoneNumber,
-			RoleName:    roleName,
-		}
+	c.JSON(http.StatusOK, mapper.MapUsersToDTO(users))
+}
+
+// UpdateUser godoc
+//
+//		@Summary		Update user
+//		@Description	Update user by phone number
+//		@Tags			users
+//	 	@Param			data			body		dto.UserRequest	true	"User data"
+//		@Success		200				{object}	dto.UserRequest
+//		@Failure		500				{object}	domain.ErrorResponse
+//		@Router			/users [patch]
+//		@Security		BearerAuth
+func (h *Handler) UpdateUser(c *gin.Context) {
+	phoneNumber, exists := c.Get("phone_number")
+	if !exists {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "unauthorized"})
+		return
 	}
 
-	c.JSON(http.StatusOK, userDTOs)
+	var req dto.UserRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "bad request"})
+		return
+	}
+
+	user, err := h.service.Update(phoneNumber.(string), req)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, mapper.MapUserToDTO(*user))
 }

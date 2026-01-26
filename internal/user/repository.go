@@ -13,6 +13,7 @@ type Repository interface {
 	Exist(phoneNumber string) (*domain.User, error)
 	GetAll() ([]domain.User, error)
 	GetByPhoneNumber(phoneNumber string) (*domain.User, error)
+	Update(user *domain.User) error
 }
 type repository struct {
 }
@@ -49,4 +50,8 @@ func (r *repository) GetByPhoneNumber(phoneNumber string) (*domain.User, error) 
 	var user domain.User
 	result := config.DB.Preload("Roles").Where("phone_number = ?", phoneNumber).First(&user)
 	return &user, result.Error
+}
+
+func (r *repository) Update(user *domain.User) error {
+	return config.DB.Save(user).Error
 }

@@ -15,13 +15,13 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.MY_KEY }}
-          script:
+          script: |
             cd ${{ secrets.APP_PATH }}
             
             echo "Pull latest code"
             git pull origin master
               
-            echo "Build containers"              
+            echo "Build containers"
             docker-compose up --build
               
             echo "DEPLOY $(date)"

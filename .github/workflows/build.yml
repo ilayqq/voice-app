@@ -12,6 +12,7 @@ jobs:
       - name: Deploy on server
         uses: appleboy/ssh-action@v1.0.3
         with:
+          host: ${{ secrets.SSH_HOST }}
           key: ${{ secrets.MY_KEY }}
           script: |
               echo "Pull latest code"

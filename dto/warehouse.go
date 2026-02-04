@@ -13,3 +13,10 @@ type WarehouseResponse struct {
 }
 
 // todo add stocks
+
+type WarehouseRequest struct {
+	Name        string `json:"name"`
+	Location    string `json:"location"`
+	Description string `json:"description"`
+	OwnerID     uint   `json:"owner_id"`
+}

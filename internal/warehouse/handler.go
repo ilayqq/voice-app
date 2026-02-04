@@ -16,6 +16,16 @@ func NewHandler(service Service) *Handler {
 	return &Handler{service: service}
 }
 
+// GetAll godoc
+//
+//	@Summary		Get warehouses
+//	@Description	Get all warehouses or filter by owner phone number
+//	@Tags			warehouses
+//	@Param			phone_number	query		string	false	"Owner phone number"
+//	@Success		200				{array}		dto.WarehouseResponse
+//	@Failure		500				{object}	domain.ErrorResponse
+//	@Router			/warehouses [get]
+//	@Security		BearerAuth
 func (h *Handler) GetAll(c *gin.Context) {
 	ownerPhone := c.Query("phone_number")
 
@@ -44,6 +54,18 @@ func (h *Handler) GetAll(c *gin.Context) {
 	c.JSON(http.StatusOK, mapper.MapWarehousesToDTO(warehouseDTO))
 }
 
+// AddWarehouse godoc
+//
+//	@Summary		Add warehouse
+//	@Description	Add new warehouse
+//	@Tags			warehouses
+//	@Accept			json
+//	@Produce		json
+//	@Param			warehouse	body		dto.WarehouseRequest	true	"Warehouse data"
+//	@Success		201			{object}	dto.WarehouseResponse
+//	@Failure		500			{object}	domain.ErrorResponse
+//	@Router			/warehouses [post]
+//	@Security		BearerAuth
 func (h *Handler) AddWarehouse(c *gin.Context) {
 	var warehouse domain.Warehouse
 	if err := c.ShouldBindJSON(&warehouse); err != nil {

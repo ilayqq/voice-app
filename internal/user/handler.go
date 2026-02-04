@@ -49,14 +49,14 @@ func (h *Handler) GetUsers(c *gin.Context) {
 
 // UpdateUser godoc
 //
-//		@Summary		Update user
-//		@Description	Update user by phone number
-//		@Tags			users
-//	 	@Param			data			body		dto.UserRequest	true	"User data"
-//		@Success		200				{object}	dto.UserRequest
-//		@Failure		500				{object}	domain.ErrorResponse
-//		@Router			/users [patch]
-//		@Security		BearerAuth
+//	@Summary		Update user
+//	@Description	Update user by phone number
+//	@Tags			users
+//	@Param			data	body		dto.UserRequest	true	"User data"
+//	@Success		200		{object}	dto.UserRequest
+//	@Failure		500		{object}	domain.ErrorResponse
+//	@Router			/users [patch]
+//	@Security		BearerAuth
 func (h *Handler) UpdateUser(c *gin.Context) {
 	phoneNumber, exists := c.Get("phone_number")
 	if !exists {

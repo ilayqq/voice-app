@@ -72,10 +72,10 @@ func (s *service) Login(phoneNumber, password string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub":         user.ID,
-		"phoneNumber": user.PhoneNumber,
-		"roles":       roleNames,
-		"exp":         time.Now().Add(24 * time.Hour).Unix(),
+		"sub":          user.ID,
+		"phone_number": user.PhoneNumber,
+		"roles":        roleNames,
+		"exp":          time.Now().Add(24 * time.Hour).Unix(),
 	})
 
 	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))

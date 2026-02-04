@@ -21,7 +21,7 @@ func NewRepository() Repository {
 func (r *repository) GetAll() ([]domain.Warehouse, error) {
 	var warehouses []domain.Warehouse
 
-	result := config.DB.Preload("Owner").Preload("Stocks").Find(&warehouses)
+	result := config.DB.Preload("Owner").Preload("Owner.Roles").Preload("Stocks").Find(&warehouses)
 	if result.Error != nil {
 		return nil, result.Error
 	}
@@ -31,7 +31,7 @@ func (r *repository) GetAll() ([]domain.Warehouse, error) {
 
 func (r *repository) GetByOwnerPhone(phoneNumber string) ([]domain.Warehouse, error) {
 	var warehouses []domain.Warehouse
-	result := config.DB.Preload("Owner").Preload("Stocks").
+	result := config.DB.Preload("Owner").Preload("Owner.Roles").Preload("Stocks").
 		Joins("JOIN users ON users.id = warehouses.owner_id").
 		Where("users.phone_number = ?", phoneNumber).Find(&warehouses)
 	return warehouses, result.Error

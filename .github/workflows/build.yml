@@ -20,7 +20,10 @@ jobs:
             
             echo "Pull latest code"
             git pull origin master
-              
+            
+            echo "Containers down"
+            docker-compose down
+            
             echo "Build containers"
             docker-compose up -d --build
               

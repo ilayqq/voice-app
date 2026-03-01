@@ -1,8 +1,11 @@
 package product
 
 import (
+	"context"
 	"net/http"
+	"time"
 	"voice-app/domain"
+	"voice-app/dto"
 
 	"github.com/gin-gonic/gin"
 )
@@ -75,4 +78,32 @@ func (h *Handler) AddProduct(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, createdProduct)
+}
+
+func (h *Handler) UpdateProduct(c *gin.Context) {
+	barcode := c.Query("barcode")
+	//barcode, err := strconv.ParseInt(c.Param("barcode"), 10, 64)
+	//if err != nil {
+	//	c.JSON(http.StatusBadRequest, gin.H{"error": "bad request"})
+	//	return
+	//}
+
+	var product dto.ProductRequest
+	if err := c.ShouldBindJSON(&product); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "bad request"})
+		return
+	}
+
+	//product.Barcode = barcode
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	updated, err := h.service.Update(ctx, barcode, product)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, updated)
 }

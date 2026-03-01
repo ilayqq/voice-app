@@ -1,11 +1,16 @@
 package product
 
-import "voice-app/domain"
+import (
+	"context"
+	"voice-app/domain"
+	"voice-app/dto"
+)
 
 type Service interface {
 	GetAll() ([]domain.Product, error)
 	GetByBarcode(code string) (*domain.Product, error)
 	Create(product domain.Product) (domain.Product, error)
+	Update(ctx context.Context, barcode string, req dto.ProductRequest) (*domain.Product, error)
 }
 
 type service struct {
@@ -36,5 +41,34 @@ func (s *service) Create(product domain.Product) (domain.Product, error) {
 	if err := s.repository.Create(&product); err != nil {
 		return domain.Product{}, err
 	}
+	return product, nil
+}
+
+func (s *service) Update(ctx context.Context, barcode string, req dto.ProductRequest) (*domain.Product, error) {
+	product, err := s.repository.GetByBarcode(barcode)
+	if err != nil {
+		return nil, err
+	}
+
+	if req.Name != nil {
+		product.Name = *req.Name
+	}
+
+	if req.Barcode != nil {
+		product.Barcode = *req.Barcode
+	}
+
+	if req.Description != nil {
+		product.Description = *req.Description
+	}
+
+	if req.Category != nil {
+		product.Category = *req.Category
+	}
+
+	if err := s.repository.Update(ctx, product); err != nil {
+		return nil, err
+	}
+
 	return product, nil
 }

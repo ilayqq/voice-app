@@ -1,6 +1,7 @@
 package product
 
 import (
+	"context"
 	"voice-app/config"
 	"voice-app/domain"
 )
@@ -9,6 +10,7 @@ type Repository interface {
 	GetAll() ([]domain.Product, error)
 	GetByBarcode(code string) (*domain.Product, error)
 	Create(product *domain.Product) error
+	Update(ctx context.Context, product *domain.Product) error
 }
 
 type repository struct{}
@@ -31,4 +33,8 @@ func (r *repository) GetByBarcode(code string) (*domain.Product, error) {
 
 func (r *repository) Create(product *domain.Product) error {
 	return config.DB.Create(&product).Error
+}
+
+func (r *repository) Update(ctx context.Context, product *domain.Product) error {
+	return config.DB.WithContext(ctx).Save(&product).Error
 }

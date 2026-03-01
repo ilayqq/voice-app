@@ -59,6 +59,7 @@ func NewRouter(
 		{
 			product.GET("", productHandler.GetAll)
 			product.POST("", productHandler.AddProduct)
+			product.PATCH("", productHandler.UpdateProduct)
 		}
 		warehouse := api.Group("/warehouse")
 		{

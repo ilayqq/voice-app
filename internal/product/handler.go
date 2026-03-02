@@ -80,6 +80,17 @@ func (h *Handler) AddProduct(c *gin.Context) {
 	c.JSON(http.StatusCreated, createdProduct)
 }
 
+// UpdateProduct godoc
+//
+//	@Summary		Update product
+//	@Description	Update product
+//	@Tags			products
+//	@Param			barcode	query		string				true	"Product barcode"
+//	@Param			data	body		dto.ProductRequest	true	"Product data"
+//	@Success		200		{object}	dto.ProductRequest
+//	@Failure		500		{object}	domain.ErrorResponse
+//	@Router			/products [patch]
+//	@Security		BearerAuth
 func (h *Handler) UpdateProduct(c *gin.Context) {
 	barcode := c.Query("barcode")
 	//barcode, err := strconv.ParseInt(c.Param("barcode"), 10, 64)

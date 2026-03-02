@@ -11,6 +11,8 @@ import (
 	"voice-app/internal/speech"
 	"voice-app/internal/user"
 	"voice-app/internal/warehouse"
+
+	"github.com/joho/godotenv"
 )
 
 //	@title			Voice-app API
@@ -23,11 +25,11 @@ import (
 // @in							header
 // @name						Authorization
 func main() {
-	//err := godotenv.Load(".env")
-	//if err != nil {
-	//	log.Fatal("Error loading .env file")
-	//}
-	
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	config.InitDB()
 
 	config.InitRedis()

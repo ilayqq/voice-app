@@ -21,7 +21,7 @@ type registerRequest struct {
 }
 
 type authRequest struct {
-	PhoneNumber string `json:"phoneNumber"`
+	PhoneNumber string `json:"phone_number" binding:"required"`
 	Password    string `json:"password"`
 }
 
@@ -70,10 +70,10 @@ func (h *Handler) Register(c *gin.Context) {
 //	@Failure		401		{object}	map[string]string
 //	@Router			/login [post]
 func (h *Handler) Login(c *gin.Context) {
-	var req = &authRequest{}
+	var req authRequest
 
-	if err := c.ShouldBindJSON(req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "bad request"})
 		return
 	}
 

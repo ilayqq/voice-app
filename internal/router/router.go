@@ -47,7 +47,7 @@ func NewRouter(
 		oauthGoogle.GET("/callback", oauthHandler.GoogleCallback)
 	}
 
-	api := r.Group("/api/v1")
+	api := r.Group("/v1")
 	api.Use(middleware.JWTAuth())
 	{
 		user := api.Group("/users")

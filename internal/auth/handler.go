@@ -15,14 +15,14 @@ func NewHandler(service Service) *Handler {
 }
 
 type registerRequest struct {
-	PhoneNumber string   `json:"phoneNumber"`
-	Password    string   `json:"password"`
+	PhoneNumber string   `json:"phone_number" binding:"required"`
+	Password    string   `json:"password" binding:"required"`
 	Roles       []string `json:"roles"`
 }
 
 type authRequest struct {
 	PhoneNumber string `json:"phone_number" binding:"required"`
-	Password    string `json:"password"`
+	Password    string `json:"password" binding:"required"`
 }
 
 type authResponse struct {
@@ -45,7 +45,7 @@ func (h *Handler) Register(c *gin.Context) {
 	var req = &registerRequest{}
 
 	if err := c.ShouldBindJSON(req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "bad request"})
 		return
 	}
 

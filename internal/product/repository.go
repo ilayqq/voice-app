@@ -11,6 +11,7 @@ type Repository interface {
 	GetByBarcode(code string) (*domain.Product, error)
 	Create(product *domain.Product) error
 	Update(ctx context.Context, product *domain.Product) error
+	Delete(ctx context.Context, product *domain.Product) error
 }
 
 type repository struct{}
@@ -37,4 +38,8 @@ func (r *repository) Create(product *domain.Product) error {
 
 func (r *repository) Update(ctx context.Context, product *domain.Product) error {
 	return config.DB.WithContext(ctx).Save(&product).Error
+}
+
+func (r *repository) Delete(ctx context.Context, product *domain.Product) error {
+	return config.DB.WithContext(ctx).Delete(&product).Error
 }

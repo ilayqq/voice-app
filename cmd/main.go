@@ -16,8 +16,8 @@ import (
 //	@title			Voice-app API
 //	@version		1.0
 //	@description	Description
-//	@host			localhost:8080
-//	@BasePath		/v1
+//	@host			sam.x64.kz
+//  @schemes 		https
 
 // @securityDefinitions.apikey	BearerAuth
 // @in							header

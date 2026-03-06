@@ -24,7 +24,7 @@ func NewHandler(service Service) *Handler {
 //	@Param			phone_number	query		string	false	"Owner phone number"
 //	@Success		200				{array}		dto.WarehouseResponse
 //	@Failure		500				{object}	domain.ErrorResponse
-//	@Router			/warehouses [get]
+//	@Router			/api/v1/warehouses [get]
 //	@Security		BearerAuth
 func (h *Handler) GetAll(c *gin.Context) {
 	ownerPhone := c.Query("phone_number")
@@ -64,7 +64,7 @@ func (h *Handler) GetAll(c *gin.Context) {
 //	@Param			warehouse	body		dto.WarehouseRequest	true	"Warehouse data"
 //	@Success		201			{object}	dto.WarehouseResponse
 //	@Failure		500			{object}	domain.ErrorResponse
-//	@Router			/warehouses [post]
+//	@Router			/api/v1/warehouses [post]
 //	@Security		BearerAuth
 func (h *Handler) AddWarehouse(c *gin.Context) {
 	var warehouse domain.Warehouse

@@ -23,11 +23,12 @@ func NewHandler(service Service) *Handler {
 //	@Summary		Get products
 //	@Description	Get all products
 //	@Tags			products
+//	@Param			barcode	query		string	false	"Product barcode"
 //	@Success		200	{array}		domain.Product
 //	@Failure		401	{object}	map[string]string
 //	@Failure		403	{object}	map[string]string
 //	@Failure		500	{object}	map[string]string
-//	@Router			/products [get]
+//	@Router			/api/v1/products [get]
 //	@Security		BearerAuth
 func (h *Handler) GetAll(c *gin.Context) {
 	barcode := c.Query("barcode")
@@ -62,7 +63,7 @@ func (h *Handler) GetAll(c *gin.Context) {
 //	@Failure		401		{object}	domain.ErrorResponse
 //	@Failure		403		{object}	domain.ErrorResponse
 //	@Failure		500		{object}	domain.ErrorResponse
-//	@Router			/products [post]
+//	@Router			/api/v1/products [post]
 //	@Security		BearerAuth
 func (h *Handler) AddProduct(c *gin.Context) {
 	var product domain.Product
@@ -89,7 +90,7 @@ func (h *Handler) AddProduct(c *gin.Context) {
 //	@Param			data	body		dto.ProductRequest	true	"Product data"
 //	@Success		200		{object}	dto.ProductRequest
 //	@Failure		500		{object}	domain.ErrorResponse
-//	@Router			/products [patch]
+//	@Router			/api/v1/products [patch]
 //	@Security		BearerAuth
 func (h *Handler) UpdateProduct(c *gin.Context) {
 	barcode := c.Query("barcode")
@@ -117,4 +118,25 @@ func (h *Handler) UpdateProduct(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, updated)
+}
+
+// DeleteProduct godoc
+//
+//	@Summary		Delete product
+//	@Description	Delete product
+//	@Tags			products
+//	@Param			id	query		string				false	"Product id"
+//	@Param			barcode	query		string				false	"Product barcode"
+//	@Success		200		{object}	dto.ProductRequest
+//	@Failure		500		{object}	domain.ErrorResponse
+//	@Router			/api/v1/products [delete]
+//	@Security		BearerAuth
+func (h *Handler) DeleteProduct(c *gin.Context) {
+	barcode := c.Query("barcode")
+	if err := h.service.Delete(barcode); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal error"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "product deleted"})
 }

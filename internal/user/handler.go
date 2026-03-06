@@ -22,7 +22,7 @@ func NewHandler(service Service) *Handler { return &Handler{service: service} }
 //	@Param			phone_number	query		string	false	"Phone number"
 //	@Success		200				{array}		dto.UserResponse
 //	@Failure		500				{object}	map[string]string
-//	@Router			/users [get]
+//	@Router			/api/v1/users [get]
 //	@Security		BearerAuth
 func (h *Handler) GetUsers(c *gin.Context) {
 	phoneNumber := c.Query("phone_number")
@@ -55,7 +55,7 @@ func (h *Handler) GetUsers(c *gin.Context) {
 //	@Param			data	body		dto.UserRequest	true	"User data"
 //	@Success		200		{object}	dto.UserRequest
 //	@Failure		500		{object}	domain.ErrorResponse
-//	@Router			/users [patch]
+//	@Router			/api/v1/users [patch]
 //	@Security		BearerAuth
 func (h *Handler) UpdateUser(c *gin.Context) {
 	phoneNumber, exists := c.Get("phone_number")

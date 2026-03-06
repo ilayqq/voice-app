@@ -11,6 +11,7 @@ type Service interface {
 	GetByBarcode(code string) (*domain.Product, error)
 	Create(product domain.Product) (domain.Product, error)
 	Update(ctx context.Context, barcode string, req dto.ProductRequest) (*domain.Product, error)
+	Delete(barcode string) error
 }
 
 type service struct {
@@ -71,4 +72,13 @@ func (s *service) Update(ctx context.Context, barcode string, req dto.ProductReq
 	}
 
 	return product, nil
+}
+
+func (s *service) Delete(barcode string) error {
+	product, err := s.repository.GetByBarcode(barcode)
+	if err != nil {
+		return err
+	}
+
+	return s.repository.Delete(context.Background(), product)
 }

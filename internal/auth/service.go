@@ -2,12 +2,8 @@ package auth
 
 import (
 	"errors"
-	"os"
-	"time"
 	"voice-app/domain"
 	"voice-app/internal/user"
-
-	"github.com/golang-jwt/jwt/v5"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -39,49 +35,32 @@ func (s *service) Register(phoneNumber, password string, roles []string) (*domai
 		return nil, err
 	}
 
-	user := &domain.User{
-		PhoneNumber: phoneNumber,
+	u := &domain.User{
+		PhoneNumber: &phoneNumber,
 		Password:    string(hash),
 		Roles:       make([]domain.Role, len(roles)),
 	}
 
 	for i, roleName := range roles {
-		user.Roles[i] = domain.Role{Name: roleName}
+		u.Roles[i] = domain.Role{Name: roleName}
 	}
 
-	if err := s.repository.Create(user); err != nil {
+	if err := s.repository.Create(u); err != nil {
 		return nil, err
 	}
 
-	return user, nil
+	return u, nil
 }
 
 func (s *service) Login(phoneNumber, password string) (string, error) {
-	user, err := s.repository.GetByPhoneNumber(phoneNumber)
+	u, err := s.repository.GetByPhoneNumber(phoneNumber)
 	if err != nil {
 		return "", errors.New("user not found")
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password)); err != nil {
+	if err := bcrypt.CompareHashAndPassword([]byte(u.Password), []byte(password)); err != nil {
 		return "", errors.New("invalid credentials")
 	}
 
-	roleNames := make([]string, len(user.Roles))
-	for i, role := range user.Roles {
-		roleNames[i] = role.Name
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"sub":          user.ID,
-		"phone_number": user.PhoneNumber,
-		"roles":        roleNames,
-		"exp":          time.Now().Add(24 * time.Hour).Unix(),
-	})
-
-	tokenString, err := token.SignedString([]byte(os.Getenv("JWT_SECRET")))
-	if err != nil {
-		return "", err
-	}
-
-	return tokenString, nil
+	return GenerateToken(u)
 }

@@ -43,7 +43,7 @@ func (s *service) Update(phoneNumber string, req dto.UserRequest) (*domain.User,
 		user.FullName = *req.FullName
 	}
 	if req.PhoneNumber != nil {
-		user.PhoneNumber = *req.PhoneNumber
+		user.PhoneNumber = req.PhoneNumber
 	}
 
 	if err := s.repository.Update(user); err != nil {

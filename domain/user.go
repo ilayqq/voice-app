@@ -1,11 +1,13 @@
 package domain
 
 type User struct {
-	ID          uint   `gorm:"primaryKey;autoIncrement" json:"id"`
-	FullName    string `gorm:"not null" json:"full_name"`
-	PhoneNumber string `gorm:"unique;not null" json:"phone_number"`
-	Password    string `gorm:"not null"`
-	Roles       []Role `gorm:"many2many:user_roles;"`
+	ID          uint    `gorm:"primaryKey;autoIncrement" json:"id"`
+	FullName    string  `gorm:"not null" json:"full_name"`
+	PhoneNumber *string `gorm:"unique" json:"phone_number"`
+	Password    string  `gorm:"not null"`
+	Email       *string `gorm:"unique" json:"email"`
+	Picture     string  `gorm:"not null; default:''" json:"picture"`
+	Roles       []Role  `gorm:"many2many:user_roles;"`
 }
 
 type Role struct {

@@ -1,50 +1,54 @@
 package oauth
 
 import (
-	"encoding/json"
 	"net/http"
-	"voice-app/config"
 
 	"github.com/gin-gonic/gin"
-	"golang.org/x/oauth2"
 )
 
 type Handler struct {
+	service Service
 }
 
-func NewHandler() *Handler {
-	return &Handler{}
+func NewHandler(service Service) *Handler {
+	return &Handler{service: service}
 }
 
 func (h *Handler) GoogleLogin(c *gin.Context) {
-	url := config.GoogleOauthConfig.AuthCodeURL("state", oauth2.AccessTypeOffline)
+	url, state, err := h.service.GetAuthURL()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate auth url"})
+		return
+	}
+	c.SetCookie("oauth_state", state, 300, "/", "", true, true)
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
 func (h *Handler) GoogleCallback(c *gin.Context) {
-	//state := c.Bind("state")
+	cookieState, err := c.Cookie("oauth_state")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing state cookie"})
+		return
+	}
+
+	if queryState := c.Query("state"); queryState == "" || queryState != cookieState {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid oauth state"})
+		return
+	}
+
+	c.SetCookie("oauth_state", "", -1, "/", "", true, true)
 
 	code := c.Query("code")
-	token, err := config.GoogleOauthConfig.Exchange(c, code)
+	if code == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing authorization code"})
+		return
+	}
+
+	result, err := h.service.GoogleCallback(c.Request.Context(), code)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to exchange code for token"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "authentication failed"})
 		return
 	}
 
-	client := config.GoogleOauthConfig.Client(c, token)
-
-	resp, err := client.Get("https://www.googleapis.com/oauth2/v3/userinfo")
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch user info"})
-		return
-	}
-	defer resp.Body.Close()
-
-	var userInfo map[string]interface{}
-	if err := json.NewDecoder(resp.Body).Decode(&userInfo); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to decode user info"})
-		return
-	}
-
-	c.JSON(http.StatusOK, userInfo)
+	c.JSON(http.StatusOK, result)
 }

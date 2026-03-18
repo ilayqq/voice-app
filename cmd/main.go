@@ -36,7 +36,9 @@ func main() {
 	authService := auth2.NewService(userRepo)
 	authHandler := auth2.NewHandler(authService)
 
-	oauthHandler := oauth.NewHandler()
+	oauthRepo := oauth.NewRepository(config.DB)
+	oauthService := oauth.NewService(config.GoogleOauthConfig, config.DB, userRepo, oauthRepo)
+	oauthHandler := oauth.NewHandler(oauthService)
 
 	userService := user.NewService(userRepo)
 	userHandler := user.NewHandler(userService)

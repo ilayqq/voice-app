@@ -15,7 +15,7 @@ func MapUserToDTO(user domain.User) dto.UserResponse {
 	return dto.UserResponse{
 		ID:          user.ID,
 		FullName:    user.FullName,
-		PhoneNumber: user.PhoneNumber,
+		PhoneNumber: *user.PhoneNumber,
 		RoleName:    roleNames,
 	}
 }

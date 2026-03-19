@@ -1,10 +1,16 @@
 package oauth
 
 import (
+	"context"
+	"log"
 	"net/http"
+	"time"
+	"voice-app/config"
 
 	"github.com/gin-gonic/gin"
 )
+
+const stateTTL = 5 * time.Minute
 
 type Handler struct {
 	service Service
@@ -20,23 +26,28 @@ func (h *Handler) GoogleLogin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate auth url"})
 		return
 	}
-	c.SetCookie("oauth_state", state, 300, "/", "", true, true)
+
+	if err := config.RD.Set(context.Background(), stateKey(state), "1", stateTTL).Err(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save state"})
+		return
+	}
+
 	c.Redirect(http.StatusTemporaryRedirect, url)
 }
 
 func (h *Handler) GoogleCallback(c *gin.Context) {
-	cookieState, err := c.Cookie("oauth_state")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "missing state cookie"})
+	state := c.Query("state")
+	if state == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "missing state"})
 		return
 	}
 
-	if queryState := c.Query("state"); queryState == "" || queryState != cookieState {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid oauth state"})
+	key := stateKey(state)
+	deleted, err := config.RD.Del(context.Background(), key).Result()
+	if err != nil || deleted == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid or expired state"})
 		return
 	}
-
-	c.SetCookie("oauth_state", "", -1, "/", "", true, true)
 
 	code := c.Query("code")
 	if code == "" {
@@ -46,9 +57,14 @@ func (h *Handler) GoogleCallback(c *gin.Context) {
 
 	result, err := h.service.GoogleCallback(c.Request.Context(), code)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "authentication failed"})
+		log.Printf("[oauth] HandleCallback error: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(http.StatusOK, result)
+}
+
+func stateKey(state string) string {
+	return "oauth_state:" + state
 }

@@ -31,6 +31,7 @@ func main() {
 	config.InitDB()
 
 	config.InitRedis()
+	config.InitGoogleOauth()
 
 	userRepo := user.NewRepository()
 	authService := auth2.NewService(userRepo)
